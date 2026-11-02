@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Faii — Portfolio</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+  :root{
+    --bg:#0c0b0a;
+    --bg-2:#141311;
+    --text:#f4f1ea;
+    --text-dim:#8b857a;
+    --accent:#e8a04c;
+    --line:rgba(244,241,234,.12);
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+    cursor:none;
+  }
+  ::selection{background:var(--accent);color:#0c0b0a}
+
+  /* ---------- cursor ---------- */
+  #cursor{
+    position:fixed;top:0;left:0;width:8px;height:8px;
+    background:var(--accent);border-radius:50%;
+    pointer-events:none;z-index:9999;
+    transition:width .3s var(--ease),height .3s var(--ease),opacity .3s;
+    mix-blend-mode:difference;
+  }
+  #cursor-ring{
+    position:fixed;top:0;left:0;width:36px;height:36px;
+    border:1px solid rgba(232,160,76,.5);border-radius:50%;
+    pointer-events:none;z-index:9998;
+    transition:transform .15s ease-out;
+  }
+
+  /* ---------- particle bg ---------- */
+  #particles{position:fixed;inset:0;z-index:0;opacity:.55}
+
+  /* ---------- layout ---------- */
+  .wrap{position:relative;z-index:1}
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:22px 5vw;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;
+    letter-spacing:.12em;text-transform:uppercase;
+    backdrop-filter:blur(8px);
+    background:linear-gradient(180deg,rgba(12,11,10,.85),rgba(12,11,10,0));
+    border-bottom:1px solid var(--line);
+  }
+  nav a{color:var(--text-dim);text-decoration:none;margin-left:28px;position:relative;transition:color .3s}
+  nav a:hover{color:var(--text)}
+  nav a::after{content:'';position:absolute;left:0;bottom:-4px;width:0;height:1px;background:var(--accent);transition:width .4s var(--ease)}
+  nav a:hover::after{width:100%}
+  .logo{color:var(--text);font-weight:700}
+  .logo span{color:var(--accent)}
+
+  section{padding:14vh 5vw;position:relative}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;
+    letter-spacing:.25em;text-transform:uppercase;color:var(--accent);
+    margin-bottom:1.2rem;display:flex;align-items:center;gap:.8rem;
+  }
+  .eyebrow::before{content:'';width:32px;height:1px;background:var(--accent)}
+  h1{
+    font-family:'Montserrat',sans-serif;font-weight:900;
+    font-size:clamp(3rem,9vw,8rem);line-height:.88;
+    letter-spacing:-.03em;
+  }
+  h2{
+    font-family:'Montserrat',sans-serif;font-weight:900;
+    font-size:clamp(2rem,4.5vw,4rem);line-height:.92;
+    letter-spacing:-.02em;margin-bottom:2.5rem;
+  }
+  p{line-height:1.7;color:var(--text-dim);max-width:52ch}
+  .reveal{opacity:0;transform:translateY(40px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- hero ---------- */
+  #hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:20vh}
+  #hero .line{overflow:hidden}
+  #hero .line span{display:inline-block;transform:translateY(110%);transition:transform 1.1s var(--ease)}
+  #hero.in .line span{transform:none}
+  #hero .line:nth-child(2) span{transition-delay:.12s}
+  #hero .line:nth-child(3) span{transition-delay:.24s}
+  .hero-sub{margin-top:2rem;font-size:1.05rem}
+  .hero-meta{
+    margin-top:4rem;display:flex;gap:3rem;flex-wrap:wrap;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;
+    letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);
+  }
+  .hero-meta b{display:block;color:var(--text);font-size:1.4rem;font-family:'Montserrat',sans-serif;letter-spacing:0;margin-top:.4rem}
+  .scroll-hint{
+    position:absolute;bottom:3rem;left:5vw;
+    font-family:'IBM Plex Mono',monospace;font-size:10px;
+    letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;
+    display:flex;align-items:center;gap:.8rem;
+  }
+  .scroll-hint::after{content:'';width:1px;height:42px;background:linear-gradient(180deg,var(--accent),transparent);animation:drip 2s infinite}
+  @keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+  /* ---------- about ---------- */
+  #about{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:start}
+  .about-grid p{font-size:1.15rem;color:var(--text)}
+  .about-grid p + p{margin-top:1.5rem;font-size:.95rem}
+  .stat-row{display:flex;gap:2.5rem;margin-top:3.5rem;flex-wrap:wrap}
+  .stat{border-top:1px solid var(--line);padding-top:.9rem}
+  .stat b{font-family:'Montserrat',sans-serif;font-size:2.4rem;font-weight:900;display:block;letter-spacing:-.02em}
+  .stat span{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim)}
+
+  /* ---------- black hole / skills (FULL BLEED TANPA POTONGAN) ---------- */
+  #skills{
+    display:grid;
+    grid-template-columns:1fr 1.25fr;
+    gap:2rem;
+    align-items:center;
+    overflow:visible;
+  }
+  .skills-list{list-style:none}
+  .skills-list li{
+    padding:1.1rem 0;border-bottom:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:1.05rem;transition:padding-left .4s var(--ease),color .3s;
+  }
+  .skills-list li:hover{padding-left:1rem;color:var(--accent)}
+  .skills-list li span{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-dim);letter-spacing:.1em}
+
+  .bh-stage{
+    position:relative;
+    width:100%;
+    height:560px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  #cube-canvas{
+    width:100%;
+    height:100%;
+    display:block;
+    cursor:grab;
+    touch-action:pan-y;
+  }
+  #cube-canvas:active{cursor:grabbing}
+
+  /* ---------- work ---------- */
+  .work-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2.5rem}
+  .card{
+    display:block;color:inherit;text-decoration:none;
+    border:1px solid var(--line);padding:2rem;background:var(--bg-2);
+    transition:transform .6s var(--ease),border-color .4s;
+    position:relative;overflow:hidden;
+  }
+  .card:hover{transform:translateY(-8px);border-color:rgba(232,160,76,.5)}
+  .card::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(400px circle at var(--mx,50%) var(--my,50%),rgba(232,160,76,.09),transparent 60%);
+    opacity:0;transition:opacity .5s;
+  }
+  .card:hover::before{opacity:1}
+  .card .num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:.2em}
+  .card h3{font-family:'Montserrat',sans-serif;font-size:1.5rem;font-weight:800;margin:.9rem 0 .7rem;letter-spacing:-.01em}
+  .card p{font-size:.92rem}
+  .tags{margin-top:1.4rem;display:flex;gap:.5rem;flex-wrap:wrap}
+  .tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:.35rem .7rem;border:1px solid var(--line);color:var(--text-dim)}
+
+  /* ---------- contact ---------- */
+  #contact{text-align:center;padding-top:20vh;padding-bottom:12vh}
+  #contact a{
+    display:inline-block;margin-top:2.5rem;
+    font-family:'Montserrat',sans-serif;font-weight:900;
+    font-size:clamp(1.6rem,4vw,3rem);letter-spacing:-.02em;
+    text-decoration:none;color:var(--text);position:relative;
+  }
+  #contact a::after{content:'';position:absolute;left:0;bottom:.1em;width:100%;height:3px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease)}
+  #contact a:hover::after{transform:scaleX(1)}
+  .socials{margin-top:3.5rem;display:flex;justify-content:center;gap:2rem;flex-wrap:wrap}
+  .socials a{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color .3s}
+  .socials a:hover{color:var(--accent)}
+  footer{padding:2.5rem 5vw;border-top:1px solid var(--line);display:flex;justify-content:center;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}
+
+  @media (max-width:900px){
+    .about-grid,.work-grid{grid-template-columns:1fr;gap:3rem}
+    #skills{
+      grid-template-columns:1fr;
+      gap:1rem;
+      padding-bottom:6vh;
+    }
+    /* Buat kanvas Black Hole Full-Width 100vw menembus batas layar HP tanpa kepotong */
+    .bh-stage{
+      width:100vw;
+      margin-left:-5vw;
+      margin-right:-5vw;
+      height:105vw;
+      min-height:400px;
+      max-height:540px;
+    }
+    nav{flex-wrap:wrap;gap:8px}
+    nav a{margin-left:14px}
+    body{cursor:auto}
+    #cursor,#cursor-ring{display:none}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<div class="wrap">
+
+<nav>
+  <div class="logo">FAII<span>.</span></div>
+  <div>
+    <a href="#about">Tentang</a>
+    <a href="#skills">Skills</a>
+    <a href="#work">Proyek</a>
+    <a href="#contact">Kontak</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="eyebrow reveal">Portfolio — 2026</div>
+  <h1>
+    <div class="line"><span>Halo, saya</span></div>
+    <div class="line"><span>Faii —</span></div>
+    <div class="line"><span>Web Developer.</span></div>
+  </h1>
+  <p class="hero-sub reveal">Membangun antarmuka web yang rapi, cepat, dan punya karakter. Fokus pada detail gerakan, tipografi, dan struktur kode yang bersih.</p>
+  <div class="hero-meta reveal">
+    <div>Status<b>Open for work</b></div>
+    <div>Lokasi<b>Jawa Timur, ID</b></div>
+    <div>Pengalaman<b>1 Tahun</b></div>
+  </div>
+  <div class="scroll-hint">Scroll</div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div>
+      <div class="eyebrow reveal">Tentang Saya</div>
+      <h2 class="reveal">Bukan sekadar <br>menulis kode.</h2>
+    </div>
+    <div class="reveal">
+      <p>Saya percaya web yang baik adalah perpaduan antara fungsi yang jelas dan estetika yang tertata. Setiap proyek saya mulai dari pertanyaan: apa yang harus dirasakan user?</p>
+      <p>Latar belakang desain grafis membawa saya ke dunia coding. Sekarang saya sedang mempelajari beberapa bahasa,seperti nodejs,nextjs,express,dll.</p>
+      <div class="stat-row">
+        <div class="stat"><b>2</b><span>Proyek selesai</span></div>
+        <div class="stat"><b>0</b><span>Klien aktif</span></div>
+        <div class="stat"><b>100%</b><span>Skor Lighthouse</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS + FULL BLEED BLACK HOLE -->
+<section id="skills">
+  <div>
+    <div class="eyebrow reveal">Kemampuan</div>
+    <h2 class="reveal">Tools harian.</h2>
+    <ul class="skills-list reveal">
+      <li>JavaScript & TypeScript <span>ES6+</span></li>
+      <li>HTML / CSS (Pure, no framework) <span>Semantic</span></li>
+      <li>React & Next.js <span>SPA / SSR</span></li>
+      <li>Node.js & Express <span>Backend ringan</span></li>
+    </ul>
+  </div>
+  <div class="bh-stage reveal">
+    <canvas id="cube-canvas" aria-label="Interactive 3D Gargantua Black Hole"></canvas>
+  </div>
+</section>
+
+<!-- WORK -->
+<section id="work">
+  <div class="eyebrow reveal">Proyek Pilihan</div>
+  <h2 class="reveal">Yang terbaru.</h2>
+  <div class="work-grid">
+    <a class="card reveal" href="https://www.faii-chat.web.id" target="_blank" rel="noopener noreferrer" aria-label="Buka Faii AI Chat">
+      <div class="num">01 / AI CHAT</div>
+      <h3>Faii AI Chat</h3>
+      <p>Platform AI Chat untuk berinteraksi dengan berbagai model AI melalui satu tempat. Praktis, fleksibel, dan mudah digunakan.</p>
+      <div class="tags">
+        <span class="tag">AI Chat</span>
+        <span class="tag">Multi Provider</span>
+        <span class="tag">API</span>
+      </div>
+    </a>
+    <a class="card reveal" href="https://www.faastream.web.id" target="_blank" rel="noopener noreferrer" aria-label="Buka FaStream">
+      <div class="num">02 / STREAMING</div>
+      <h3>FaStream</h3>
+      <p>Platform streaming anime dengan katalog judul, pencarian, pilihan episode, dan pemutar video dalam satu website.</p>
+      <div class="tags">
+        <span class="tag">Anime</span>
+        <span class="tag">Streaming</span>
+        <span class="tag">Web App</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="eyebrow reveal" style="justify-content:center">Kontak</div>
+  <h2 class="reveal">Ada Masalah?<br>Hubungi Admin.</h2>
+  <a href="mailto:faiii4rever@gmail.com" class="reveal">faii4rever@gmail.com</a>
+  <div class="socials reveal">
+    <a href="https://www.instagram.com/mdzzaja_">Instagram</a>
+    <a href="https://www.tiktok.com/@mdzz_low">Tiktok</a>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Faii</span>
+</footer>
+
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.183/build/three.module.js" } }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+/* ================= CUSTOM CURSOR ================= */
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0, my=0, rx=0, ry=0;
+window.addEventListener('mousemove', e=>{
+  mx=e.clientX; my=e.clientY;
+  cur.style.transform=`translate(${mx-4}px,${my-4}px)`;
+});
+(function ringLoop(){
+  rx += (mx-rx)*.18; ry += (my-ry)*.18;
+  ring.style.transform=`translate(${rx-18}px,${ry-18}px)`;
+  requestAnimationFrame(ringLoop);
+})();
+document.querySelectorAll('a,button,.card,#cube-canvas').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.width='24px';cur.style.height='24px';cur.style.marginLeft='-8px';cur.style.marginTop='-8px';});
+  el.addEventListener('mouseleave',()=>{cur.style.width='8px';cur.style.height='8px';cur.style.marginLeft='0';cur.style.marginTop='0';});
+});
+
+/* ================= PARTICLE FIELD ================= */
+const pc = document.getElementById('particles');
+const pctx = pc.getContext('2d');
+let pw, ph, parts=[];
+function pInit(){
+  pw = pc.width = innerWidth;
+  ph = pc.height = innerHeight;
+  parts = Array.from({length: innerWidth<768?40:90}, ()=>({
+    x: Math.random()*pw, y: Math.random()*ph,
+    vx:(Math.random()-.5)*.25, vy:(Math.random()-.5)*.25,
+    r: Math.random()*1.4+.4,
+    a: Math.random()*.5+.15
+  }));
+}
+pInit();
+addEventListener('resize',pInit);
+(function pLoop(){
+  pctx.clearRect(0,0,pw,ph);
+  parts.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0)p.x=pw; if(p.x>pw)p.x=0;
+    if(p.y<0)p.y=ph; if(p.y>ph)p.y=0;
+    pctx.beginPath();
+    pctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    pctx.fillStyle=`rgba(232,160,76,${p.a})`;
+    pctx.fill();
+  });
+  requestAnimationFrame(pLoop);
+})();
+
+/* ================= SCROLL REVEAL ================= */
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{threshold:.12, rootMargin:'0px 0px -8% 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+setTimeout(()=>document.getElementById('hero').classList.add('in'),300);
+
+/* ================= CARD GLOW ================= */
+document.querySelectorAll('.card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    card.style.setProperty('--mx',(e.clientX-r.left)+'px');
+    card.style.setProperty('--my',(e.clientY-r.top)+'px');
+  });
+});
+
+/* ================= 3D SEAMLESS BLACK HOLE ================= */
+const cc = document.getElementById('cube-canvas');
+const renderer = new THREE.WebGLRenderer({
+  canvas: cc,
+  powerPreference: "high-performance",
+  antialias: false,
+  alpha: true
+});
+renderer.setClearColor(0x000000, 0);
+const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+renderer.setPixelRatio(dpr);
+
+const scene = new THREE.Scene();
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+function createSeamlessNoiseTexture() {
+  const size = 256;
+  const data = new Uint8Array(size * size * 4);
+  const grid = new Float32Array(size * size);
+  for (let i = 0; i < size * size; i++) grid[i] = Math.random();
+
+  function sampleOctave(x, y, freq, seed) {
+    const fx = (x / size) * freq;
+    const fy = (y / size) * freq;
+    const ix = Math.floor(fx);
+    const iy = Math.floor(fy);
+    const dx = fx - ix;
+    const dy = fy - iy;
+    const ux = dx * dx * (3 - 2 * dx);
+    const uy = dy * dy * (3 - 2 * dy);
+
+    const x0 = ((ix % freq) + freq) % freq;
+    const x1 = (x0 + 1) % freq;
+    const y0 = ((iy % freq) + freq) % freq;
+    const y1 = (y0 + 1) % freq;
+
+    const c00 = grid[((y0 * 19 + seed) & 255) * 256 + ((x0 * 37 + seed) & 255)];
+    const c10 = grid[((y0 * 19 + seed) & 255) * 256 + ((x1 * 37 + seed) & 255)];
+    const c01 = grid[((y1 * 19 + seed) & 255) * 256 + ((x0 * 37 + seed) & 255)];
+    const c11 = grid[((y1 * 19 + seed) & 255) * 256 + ((x1 * 37 + seed) & 255)];
+
+    return (c00 * (1 - ux) + c10 * ux) * (1 - uy) + (c01 * (1 - ux) + c11 * ux) * uy;
+  }
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const r = sampleOctave(x, y, 4, 11) * 0.50 +
+                sampleOctave(x, y, 8, 23) * 0.25 +
+                sampleOctave(x, y, 16, 47) * 0.15 +
+                sampleOctave(x, y, 32, 89) * 0.10;
+
+      const g = sampleOctave(x, y, 8, 101) * 0.35 +
+                sampleOctave(x, y, 24, 153) * 0.35 +
+                sampleOctave(x, y, 64, 211) * 0.30;
+
+      const idx = (y * size + x) * 4;
+      data[idx] = Math.min(255, Math.floor(r * 255));
+      data[idx + 1] = Math.min(255, Math.floor(g * 255));
+      data[idx + 2] = 0;
+      data[idx + 3] = 255;
+    }
+  }
+
+  const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.magFilter = THREE.LinearFilter;
+  texture.minFilter = THREE.LinearFilter;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+const vertShader = `
+  void main() {
+    gl_Position = vec4(position, 1.0);
+  }
+`;
+
+const fragShader = `
+  precision highp float;
+
+  uniform vec2 u_resolution;
+  uniform float u_time;
+  uniform vec3 u_camPos;
+  uniform mat3 u_camMat;
+  uniform sampler2D u_noiseTex;
+
+  #define PI 3.14159265359
+  #define TAU 6.28318530718
+
+  void sampleAccretionDisk(vec3 hitPos, vec3 rayDir, float diskInner, float diskOuter, inout vec3 accumColor, inout float transmittance) {
+    float r = length(hitPos.xz);
+    if (r <= diskInner || r >= diskOuter) return;
+
+    float normR = (r - diskInner) / (diskOuter - diskInner);
+    // Fade ekstra halus di tepi luar agar tidak pernah terpotong tepi layar
+    float radialFade = smoothstep(0.0, 0.07, normR) * pow(1.0 - smoothstep(0.0, 1.0, normR), 2.1);
+
+    float angle = atan(hitPos.z, hitPos.x);
+    float uAngle = angle / TAU + 0.5;
+
+    vec2 uv1 = vec2(uAngle * 2.0 + r * 0.28 - u_time * 0.24, r * 0.16);
+    vec2 uv2 = vec2(uAngle * 4.0 + r * 0.54 - u_time * 0.15, r * 0.36);
+    vec2 uv3 = vec2(uAngle * 8.0 + r * 0.92 - u_time * 0.09, r * 0.72);
+
+    vec2 t1 = texture2D(u_noiseTex, uv1).rg;
+    vec2 t2 = texture2D(u_noiseTex, uv2).rg;
+    vec2 t3 = texture2D(u_noiseTex, uv3).rg;
+
+    float clouds = t1.r * 0.50 + t2.r * 0.35 + t3.r * 0.15;
+    float filaments = t1.g * 0.35 + t2.g * 0.40 + t3.g * 0.25;
+    float ringStreaks = texture2D(u_noiseTex, vec2(r * 1.5, uAngle - u_time * 0.05)).g;
+
+    float density = smoothstep(0.20, 0.80, clouds * 0.55 + filaments * 0.30 + ringStreaks * 0.25);
+    density *= radialFade;
+
+    if (density > 0.001) {
+      vec3 velDir = normalize(vec3(-hitPos.z, 0.0, hitPos.x));
+      float doppler = dot(rayDir, velDir);
+      float beaming = pow(clamp(1.0 - doppler * 0.54, 0.20, 2.15), 2.9);
+
+      vec3 coreHot = vec3(1.0, 0.98, 0.93);
+      vec3 goldMid = vec3(0.95, 0.58, 0.18);
+      vec3 crimsonOuter = vec3(0.48, 0.06, 0.01);
+
+      vec3 gasCol = mix(coreHot, goldMid, smoothstep(0.0, 0.30, normR));
+      gasCol = mix(gasCol, crimsonOuter, smoothstep(0.26, 0.95, normR));
+
+      float shift = clamp(-doppler * 0.5 + 0.5, 0.0, 1.0);
+      gasCol *= mix(vec3(1.0, 0.62, 0.42), vec3(0.92, 0.98, 1.22), shift);
+
+      float alpha = clamp(density * 0.82, 0.0, 1.0);
+      accumColor += transmittance * gasCol * beaming * density * 2.3;
+      transmittance *= (1.0 - alpha * 0.78);
+    }
+  }
+
+  void main() {
+    float minDim = min(u_resolution.x, u_resolution.y);
+    vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / minDim;
+
+    // Mask jarak dari tengah kanvas supaya tepi kanvas 100% transparan menyatu ke web (#0c0b0a)
+    float screenDist = length(uv);
+    float edgeMask = 1.0 - smoothstep(0.36, 0.495, screenDist);
+    if (edgeMask <= 0.001) {
+      gl_FragColor = vec4(0.0);
+      return;
+    }
+
+    vec3 pos = u_camPos;
+    vec3 dir = normalize(u_camMat * vec3(uv, 1.15));
+
+    vec3 accumColor = vec3(0.0);
+    float transmittance = 1.0;
+
+    const float rs = 1.0;
+    const float diskInner = 1.62;
+    const float diskOuter = 6.8; // Ukuran pas agar seluruh sayap akresi masuk utuh di dalam layar
+
+    bool swallowed = false;
+    float minPhotonDist = 100.0;
+
+    float jitter = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+    pos += dir * (jitter * 0.035);
+
+    for (int i = 0; i < 88; i++) {
+      float r2 = dot(pos, pos);
+      float r = sqrt(r2);
+
+      minPhotonDist = min(minPhotonDist, abs(r - 1.5 * rs));
+
+      if (r < rs * 1.01) {
+        swallowed = true;
+        break;
+      }
+      if (r > 24.0) break;
+
+      float dt = max(0.028, min(0.45, (r - rs * 0.88) * 0.13));
+      dt = min(dt, abs(pos.y) * 0.65 + 0.025);
+
+      vec3 hVec = cross(pos, dir);
+      float h2 = dot(hVec, hVec);
+      vec3 accel = -1.5 * rs * h2 * pos / (r2 * r2 * r);
+
+      vec3 nextDir = normalize(dir + accel * dt);
+      vec3 nextPos = pos + nextDir * dt;
+
+      for (int layer = -1; layer <= 1; layer++) {
+        float planeY = float(layer) * 0.036;
+        float y0 = pos.y - planeY;
+        float y1 = nextPos.y - planeY;
+        if (y0 * y1 <= 0.0) {
+          float t = abs(y0) / (abs(y0) + abs(y1) + 1e-6);
+          vec3 hitPos = mix(pos, nextPos, t);
+          sampleAccretionDisk(hitPos, nextDir, diskInner, diskOuter, accumColor, transmittance);
+        }
+      }
+
+      if (transmittance < 0.008) break;
+
+      pos = nextPos;
+      dir = nextDir;
+    }
+
+    if (!swallowed) {
+      float photonGlow = exp(-minPhotonDist * 28.0) * 0.90 + exp(-minPhotonDist * 7.0) * 0.15;
+      accumColor += transmittance * vec3(1.0, 0.78, 0.45) * photonGlow;
+    }
+
+    // Soft Anamorphic Flare yang otomatis memudar sebelum menyentuh pinggir layar
+    float shadowMask = swallowed ? 0.12 : 1.0;
+    float flare = exp(-abs(uv.y * 16.0 + uv.x * 2.8)) * exp(-abs(uv.x) * 3.2);
+    accumColor += vec3(1.0, 0.55, 0.2) * flare * 0.14 * shadowMask;
+
+    // Tone Mapping & Gamma
+    accumColor *= 1.18 * edgeMask;
+    vec3 a = accumColor * (accumColor + 0.0245786) - 0.000090537;
+    vec3 b = accumColor * (0.983729 * accumColor + 0.4329510) + 0.238081;
+    vec3 finalColor = clamp(a / b, 0.0, 1.0);
+    finalColor = pow(finalColor, vec3(1.0 / 2.2));
+
+    // Hitung opasitas (Alpha): Bola hitam di tengah 100% solid, cahaya gas menyatu halus, ruang kosong transparan
+    float diskOpacity = 1.0 - transmittance;
+    float glowLum = clamp(dot(finalColor, vec3(0.35, 0.5, 0.15)) * 2.2, 0.0, 1.0);
+    float finalAlpha = swallowed ? 1.0 : clamp(max(diskOpacity, glowLum), 0.0, 1.0);
+    finalAlpha *= edgeMask;
+
+    gl_FragColor = vec4(finalColor, finalAlpha);
+  }
+`;
+
+const uniforms = {
+  u_resolution: { value: new THREE.Vector2(1, 1) },
+  u_time: { value: 0 },
+  u_camPos: { value: new THREE.Vector3() },
+  u_camMat: { value: new THREE.Matrix3() },
+  u_noiseTex: { value: createSeamlessNoiseTexture() }
+};
+
+function sizeBlackHole() {
+  const stage = cc.parentElement;
+  const w = stage.clientWidth || window.innerWidth;
+  const h = stage.clientHeight || 480;
+  renderer.setSize(w, h, false);
+  uniforms.u_resolution.value.set(w * dpr, h * dpr);
+}
+sizeBlackHole();
+addEventListener('resize', sizeBlackHole);
+
+const material = new THREE.ShaderMaterial({
+  vertexShader: vertShader,
+  fragmentShader: fragShader,
+  uniforms: uniforms,
+  transparent: true,
+  depthWrite: false
+});
+
+scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+// Sudut Kamera Hero Gargantua: Jarak pas agar seluruh cincin & sayap tidak kepotong
+let targetTheta = 0.35;
+let targetPhi   = 1.485; // Sudut sinematik tipis di atas ekuator
+let targetDist  = 17.5;  // Jarak ideal agar piringan utuh 100% di dalam kanvas
+
+let camTheta = -0.8;
+let camPhi   = 1.25;
+let camDist  = targetDist + 7.5;
+const camRoll = -0.20;
+
+let isDragging = false;
+let prevTouch = { x: 0, y: 0 };
+
+cc.addEventListener('pointerdown', e => {
+  isDragging = true;
+  prevTouch = { x: e.clientX, y: e.clientY };
+});
+
+addEventListener('pointermove', e => {
+  if (!isDragging) return;
+  const dx = (e.clientX - prevTouch.x) * 0.005;
+  const dy = (e.clientY - prevTouch.y) * 0.004;
+  targetTheta -= dx;
+  // Batasi kemiringan vertikal agar pengguna tidak tidak sengaja memutar ke kutub atas (top-down)
+  targetPhi = Math.max(1.22, Math.min(1.82, targetPhi - dy));
+  prevTouch = { x: e.clientX, y: e.clientY };
+});
+
+addEventListener('pointerup', () => isDragging = false);
+addEventListener('pointercancel', () => isDragging = false);
+
+let isCanvasVisible = false;
+const bhObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    isCanvasVisible = entry.isIntersecting;
+  });
+}, { threshold: 0.02 });
+bhObserver.observe(cc);
+
+const clock = new THREE.Clock();
+(function bhLoop() {
+  requestAnimationFrame(bhLoop);
+  if (!isCanvasVisible) return;
+
+  uniforms.u_time.value = clock.getElapsedTime();
+
+  if (!isDragging) targetTheta += 0.0012;
+
+  camTheta += (targetTheta - camTheta) * 0.05;
+  camPhi   += (targetPhi - camPhi) * 0.05;
+  camDist  += (targetDist - camDist) * 0.05;
+
+  const x = camDist * Math.sin(camPhi) * Math.sin(camTheta);
+  const y = camDist * Math.cos(camPhi);
+  const z = camDist * Math.sin(camPhi) * Math.cos(camTheta);
+
+  uniforms.u_camPos.value.set(x, y, z);
+
+  const forward = new THREE.Vector3(-x, -y, -z).normalize();
+  const worldUp = new THREE.Vector3(0, 1, 0);
+  worldUp.applyAxisAngle(forward, camRoll);
+
+  const right = new THREE.Vector3().crossVectors(worldUp, forward).normalize();
+  const up = new THREE.Vector3().crossVectors(forward, right).normalize();
+
+  uniforms.u_camMat.value.set(
+    right.x, up.x, forward.x,
+    right.y, up.y, forward.y,
+    right.z, up.z, forward.z
+  );
+
+  renderer.render(scene, camera);
+})();
+</script>
+
+</body>
+</html>
